@@ -6,8 +6,6 @@ from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain.chains import RetrievalQA
 from langchain import PromptTemplate
 from langchain.embeddings import HuggingFaceEmbeddings
-# Facebook AI Similarity Search (Faiss), a library that allows us to quickly search for multimedia documents
-# Great article on FAISS: https://engineering.fb.com/2017/03/29/data-infrastructure/faiss-a-library-for-efficient-similarity-search/
 from langchain.vectorstores import FAISS
 from flask import Flask, request, jsonify, send_from_directory, jsonify, abort
 import os
