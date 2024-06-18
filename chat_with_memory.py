@@ -66,10 +66,15 @@ def main():
     if 'messages' not in st.session_state:
         st.session_state['messages'] = []
 
-    # CSS to fix the input box at the bottom
+    # CSS to fix the input box at the bottom and make the chat messages scrollable
     st.markdown(
         """
         <style>
+        .chat-container {
+            height: calc(100vh - 160px);
+            overflow-y: auto;
+            padding-bottom: 80px;
+        }
         .chat-input-container {
             position: fixed;
             bottom: 0;
@@ -79,27 +84,26 @@ def main():
             padding: 10px;
             border-top: 1px solid #ddd;
         }
-        .chat-messages {
-            margin-bottom: 80px; /* Adjust this value based on the height of the input box */
-        }
         </style>
         """,
         unsafe_allow_html=True
     )
 
+    st.header("Chat with Your PDF")
+
     with st.container():
-        st.header("Chat with Your PDF")
-        
-        # Display all previous chat messages
-        messages_container = st.container()
-        with messages_container:
-            for message in st.session_state.messages:
-                with st.chat_message(message["role"]):
-                    st.write(message["content"])
-        
-        # Placeholder for the chat input at the bottom
-        with st.container():
-            chat_input_placeholder = st.empty()
+        chat_container = st.empty()
+
+    with chat_container.container():
+        st.markdown('<div class="chat-container">', unsafe_allow_html=True)
+        for message in st.session_state.messages:
+            with st.chat_message(message["role"]):
+                st.write(message["content"])
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    with st.markdown('<div class="chat-input-container">', unsafe_allow_html=True):
+        user_input_x = st.chat_input("Type your message...", key='content', on_submit=chat_content)
+    st.markdown('</div>', unsafe_allow_html=True)
 
     with st.sidebar:
         st.title("Menu:")
@@ -113,12 +117,6 @@ def main():
                     st.success("Done")
             else:
                 st.warning("Please upload at least one PDF file.")
-    
-    # Add the chat input at the bottom
-    with chat_input_placeholder.container():
-        st.markdown('<div class="chat-input-container">', unsafe_allow_html=True)
-        user_input_x = st.chat_input("Type your message...", key='content', on_submit=chat_content)
-        st.markdown('</div>', unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
