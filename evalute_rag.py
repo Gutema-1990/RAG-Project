@@ -80,13 +80,6 @@ class OllamaOpenAI(DeepEvalBaseLLM):
     def get_model_name(self):
         return "Custom Azure OpenAI Model"
 model = OpenAI(base_url="http://10.2.125.37:1234/v1", api_key="lm-studio")
-# Replace these with real values
-# custom_model = OllamaOpenAI(
-#     openai_api_version=openai_api_version,
-#     azure_deployment=azure_deployment,
-#     azure_endpoint=azure_endpoint,
-#     openai_api_key=openai_api_key,
-# )
 ollama_openai = OllamaOpenAI(model=model)
 
 
@@ -124,7 +117,12 @@ def evaluate_rag(chunks_query_retriever, num_questions: int = 5) -> None:
         chunks_query_retriever: Function to retrieve context chunks for a given query.
         num_questions (int): Number of questions to evaluate (default: 5).
     """
-    llm = ChatOpenAI(temperature=0, model_name="gpt-4o", max_tokens=2000)
+    # llm = ChatOpenAI(temperature=0, model_name="gpt-4o", max_tokens=2000)
+    llm = ChatOpenAI(
+                model="lmstudio-community/Meta-Llama-3.1-8B-Instruct-GGUF",
+                base_url="http://10.2.125.37:1234/v1",
+                api_key="lm-studio"
+            ) 
     question_answer_from_context_chain = create_question_answer_from_context_chain(llm)
     
     # Load questions and answers from JSON file

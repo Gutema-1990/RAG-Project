@@ -4,6 +4,11 @@ from langchain_openai import OpenAIEmbeddings
 from langchain.vectorstores import FAISS
 from langchain_core.pydantic_v1 import BaseModel, Field
 from langchain import PromptTemplate
+import os
+from langchain_nomic import NomicEmbeddings
+from dotenv import load_dotenv
+
+
 import fitz
 from typing import List
 from rank_bm25 import BM25Okapi
@@ -12,7 +17,9 @@ import random
 import textwrap
 import numpy as np
 
+load_dotenv()  # Load environment variables from .env file
 
+api_key = os.getenv("NOMIC_API_KEY")
 
 
 
@@ -73,7 +80,8 @@ def encode_pdf(path, chunk_size=1000, chunk_overlap=200):
     cleaned_texts = replace_t_with_space(texts)
 
     # Create embeddings and vector store
-    embeddings = OpenAIEmbeddings()
+    embeddings = NomicEmbeddings(
+    model="nomic-embed-text-v1.5",)
     vectorstore = FAISS.from_documents(cleaned_texts, embeddings)
 
     return vectorstore
@@ -119,7 +127,8 @@ def encode_from_string(content, chunk_size=1000, chunk_overlap=200):
             chunk.metadata['relevance_score'] = 1.0
 
         # Generate embeddings and create the vector store
-        embeddings = OpenAIEmbeddings()
+        embeddings = NomicEmbeddings(
+                                model="nomic-embed-text-v1.5",)
         vectorstore = FAISS.from_documents(chunks, embeddings)
 
     except Exception as e:
