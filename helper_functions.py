@@ -7,6 +7,7 @@ from langchain import PromptTemplate
 import os
 from langchain_nomic import NomicEmbeddings
 from dotenv import load_dotenv
+from openai.error import RateLimitError
 
 
 import fitz
