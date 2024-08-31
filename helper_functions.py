@@ -7,7 +7,8 @@ from langchain import PromptTemplate
 import os
 from langchain_nomic import NomicEmbeddings
 from dotenv import load_dotenv
-from openai.error import RateLimitError
+import openai
+# from openai.error import RateLimitError
 
 
 import fitz
@@ -322,7 +323,7 @@ async def retry_with_exponential_backoff(coroutine, max_retries=5):
         try:
             # Attempt to execute the coroutine
             return await coroutine
-        except RateLimitError as e:
+        except openai.RateLimitError as e:
             # If the last attempt also fails, raise the exception
             if attempt == max_retries - 1:
                 raise e
