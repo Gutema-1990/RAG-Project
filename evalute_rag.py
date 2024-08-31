@@ -19,7 +19,8 @@ from typing import List, Tuple
 from deepeval import evaluate
 from deepeval.metrics import GEval, FaithfulnessMetric, ContextualRelevancyMetric
 from deepeval.test_case import LLMTestCase, LLMTestCaseParams
-from langchain_openai import ChatOpenAI
+from langchain_openai import ChatOpenAI, OpenAI
+from deepeval.models.base_model import DeepEvalBaseLLM
 
 
 from helper_functions import (
@@ -57,11 +58,42 @@ def create_deep_eval_test_cases(
             questions, gt_answers, generated_answers, retrieved_documents
         )
     ]
+class OllamaOpenAI(DeepEvalBaseLLM):
+    def __init__(
+        self,
+        model
+    ):
+        self.model = model
+
+    def load_model(self):
+        return self.model
+
+    def generate(self, prompt: str) -> str:
+        chat_model = self.load_model()
+        return chat_model.invoke(prompt).content
+
+    async def a_generate(self, prompt: str) -> str:
+        chat_model = self.load_model()
+        res = await chat_model.ainvoke(prompt)
+        return res.content
+
+    def get_model_name(self):
+        return "Custom Azure OpenAI Model"
+model = OpenAI(base_url="http://10.2.125.37:1234/v1", api_key="lm-studio")
+# Replace these with real values
+# custom_model = OllamaOpenAI(
+#     openai_api_version=openai_api_version,
+#     azure_deployment=azure_deployment,
+#     azure_endpoint=azure_endpoint,
+#     openai_api_key=openai_api_key,
+# )
+ollama_openai = OllamaOpenAI(model=model)
+
 
 # Define evaluation metrics
 correctness_metric = GEval(
     name="Correctness",
-    model="gpt-4o",
+    model=ollama_openai,
     evaluation_params=[
         LLMTestCaseParams.EXPECTED_OUTPUT,
         LLMTestCaseParams.ACTUAL_OUTPUT
@@ -73,15 +105,16 @@ correctness_metric = GEval(
 
 faithfulness_metric = FaithfulnessMetric(
     threshold=0.7,
-    model="gpt-4",
+    model=ollama_openai,
     include_reason=False
 )
 
 relevance_metric = ContextualRelevancyMetric(
     threshold=1,
-    model="gpt-4",
+    model=ollama_openai,
     include_reason=True
 )
+
 
 def evaluate_rag(chunks_query_retriever, num_questions: int = 5) -> None:
     """
