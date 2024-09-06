@@ -3,3 +3,4 @@ vector_xx
 virtualenv
 .env
 data
+venv
